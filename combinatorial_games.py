@@ -103,23 +103,27 @@ class ACG(object) :
         """
         Return the score of the game if L is the
         next to move.  L looks for high scores.
+        The score is the first item in the tuple
+        that is returned.  The remaining items are
+        the sequence of games that led to this
+        score.
         """
         if self.leafL() :
-            return (self.leafScore(),self)
+            #
+            # Here L has no possible moves.  Return
+            # the leaf score at the current leaf.
+            #
+            return self.leafScore(), self
         else :
             games = self.L()
             max_g = games[0]
-            max_score = g.scoreR()
+            max_score = max_g.scoreR()
             for g in games[1:] :
                 score = g.scoreR()
-                if score[0] == self.max_score :
-                    return (score+(g,))
-                else :
-                    if score > max_score :
-                        max_g = g
-                        max_score = score
-            return (max_score+(g,))
-            #return max(g.scoreR()+(g,) for g in self.L())
+                if score[0] > max_score[0] :
+                    max_g = g
+                    max_score = score
+            return (max_score+(max_g,))
     
     def scoreR(self) :
         """
@@ -127,21 +131,17 @@ class ACG(object) :
         next to move.  R looks for low scores
         """
         if self.leafR() :
-            return (self.leafScore(),self)
+            return self.leafScore(), self
         else :
             games = self.R()
             min_g = games[0]
-            min_score = g.scoreL()
+            min_score = min_g.scoreL()
             for g in games[1:] :
                 score = g.scoreL()
-                if score[0] == self.min_score :
-                    return (score+(g,))
-                else :
-                    if score < min_score :
-                        min_g = g
-                        min_score = score
-            return (min_score+(g,))
-            #return min(g.scoreL()+(g,) for g in self.R())
+                if score[0] < min_score[0] :
+                    min_g = g
+                    min_score = score
+            return (min_score+(min_g,))
             
     def playL(self,level=-1) :
         """
